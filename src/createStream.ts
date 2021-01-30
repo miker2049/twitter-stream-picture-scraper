@@ -1,12 +1,13 @@
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import fetch from 'node-fetch'
-dotenv.config()
 
 const ENDPOINT = "https://api.twitter.com/"
 const STREAM = "2/tweets/search/stream"
 const STREAMRULES = ENDPOINT+STREAM + "/rules"
 const STREAMEXPANSIONS = "?expansions=attachments.media_keys&media.fields=preview_image_url,url&tweet.fields=attachments,author_id,created_at"
 const GETSTREAM = ENDPOINT+STREAM+STREAMEXPANSIONS
+
+dotenv.config()
 
 function getAllRuleIDS(): Promise<string[]>{
     return new Promise((resolve,_rej)=>{
@@ -20,7 +21,7 @@ function getAllRuleIDS(): Promise<string[]>{
         })
 }
 
-function deleteAllRuleIDS(ids: string[]): Promise<Response>{
+function deleteAllRuleIDS(ids: string[]): Promise<any>{
     return new Promise((resolve,_rej)=>{
             fetch(STREAMRULES,{
                 method: "POST",
@@ -35,7 +36,7 @@ function deleteAllRuleIDS(ids: string[]): Promise<Response>{
 /*
  * Takes an array of tuples, where [rule, tag]
  */
-export function createRules(rules: [string, string]): Promise<Response>{
+export function createRules(query, tag): Promise<any>{
     return new Promise((resolve,_rej)=>{
             fetch(STREAMRULES,{
                 method: "POST",
@@ -43,8 +44,11 @@ export function createRules(rules: [string, string]): Promise<Response>{
                     'Authorization': 'Bearer '+process.env.TWITTER_BEARER_TOKEN,
                     'Content-type': 'application/json'
                 },
-                body: JSON.stringify({add: rules.map(rule=>{return{value:rule[0],tag:rule[1]}})})
-            }).then(res=>resolve(res))
+                body: JSON.stringify({ add: [ {value: query, tag: tag} ] })
+            }).then(res=>{
+                console.log(res)
+                resolve(res)
+            }).catch((err)=>console.log(err))
         })
 }
 

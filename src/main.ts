@@ -1,32 +1,15 @@
-/**
- * Some predefined delays (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
-}
+import {createStream, deleteAllRules, createRules} from './createStream'
+import { existsSync, mkdirSync } from 'fs'
+import Validator from './Validator'
 
-/**
- * Returns a Promise<string> that resolves after given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - Number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
 
-// Below are examples of using ESLint errors suppression
-// Here it is suppressing missing return type definitions for greeter function
+(async function(query: string, tag: string, outDir: string, count: number){
+  if (!existsSync(outDir)){
+    mkdirSync(outDir);
+  }
+  await deleteAllRules()
+  await createRules(query, tag)
+  let [stream, abort] = await createStream()
+  new Validator(stream, tag, query, count, outDir, abort)
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function greeter(name: string) {
-  return await delayedHello(name, Delays.Long);
-}
+})("(love has:images) (my OR friends OR time)", "love", "out/love/", 240)

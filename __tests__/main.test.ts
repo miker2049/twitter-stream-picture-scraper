@@ -8,33 +8,7 @@ import Jimp from 'jimp';
 
 
 describe('jimp loader',()=>{
-  let buff1: Buffer
-  let buff1_again: Buffer
-  let buff2: Buffer
-  let buff3: Buffer
-  let buff4: Buffer
-  let buff5: Buffer
-  let buff6: Buffer
-  let buff7: Buffer
-  let buff8: Buffer
-  let buff9: Buffer
-  let buff10: Buffer
 
-  beforeAll(async()=>{
-    // buff1 =await (await downloadJimpImg('./__tests__/assets/one.png')).getBufferAsync(Jimp.MIME_PNG)
-    // buff1_again =await (await downloadJimpImg('./__tests__/assets/one.png')).getBufferAsync(Jimp.MIME_PNG)
-    // buff2 =await (await downloadJimpImg('./__tests__/assets/two.png')).getBufferAsync(Jimp.MIME_PNG)
-    // buff1_again =await downloadJimpImg('./__tests__/assets/one.png')
-    // buff2 =await downloadJimpImg('./__tests__/assets/two.png')
-    // buff3 =await downloadJimpImg('./__tests__/assets/three.jpg')
-    // buff4 =await downloadJimpImg('./__tests__/assets/four.jpg')
-    // buff5 =await downloadJimpImg('./__tests__/assets/five.png')
-    // buff6 =await downloadJimpImg('./__tests__/assets/six.png')
-    // buff7 =await downloadJimpImg('./__tests__/assets/seven.jpg')
-    // buff8 =await downloadJimpImg('./__tests__/assets/eight.jpg')
-    // buff9 =await downloadJimpImg('./__tests__/assets/nine.jpg')
-    // buff10 =await downloadJimpImg('./__tests__/assets/ten.jpg')
-  })
   it('the downloadJimpImg func', async ()=>{
     let testjimp = await downloadJimpImg('./__tests__/assets/one.png')
     let testjimp_again = await downloadJimpImg('./__tests__/assets/one.png')
@@ -57,30 +31,49 @@ describe('jimp loader',()=>{
     // expect(testbuff).toBeInstanceOf(Buffer)
     // expect(testbuff2).toBeInstanceOf(Buffer)
   })
-  // it('gets a buff', ()=> {
-  //   console.log(buff1)
-  //   expect(typeof buff1).toBe('obj')
-  // });
-  // describe('compareImages function', () => {
-  //   it('successfully discriminates two pictures is identical or not', async ()=>{
-  //     const different = await compare2Images( buff1, buff2)
-  //     const same = await compare2Images( buff1, buff1_again)
-  //     expect(different).toBe(true)
-  //     expect(same).toBe(false)
-  //   })
-  //   it('works between png and jpg', async ()=>{
-  //     const different = await compare2Images( buff1, buff2)
-  //     expect(different).toBe(true)
-  //   })
-  // })
+  describe('comparing images', () => {
+  let buff1: Jimp
+  let buff1_again: Jimp
+  let buff2: Jimp
+  let buff3: Jimp
+  let buff4: Jimp
+  let buff5: Jimp
+  let buff6: Jimp
+  let buff7: Jimp
+  let buff8: Jimp
+  let buff9: Jimp
+  let buff10: Jimp
+  beforeAll(async()=>{
+    buff1 =await downloadJimpImg('./__tests__/assets/one.png')
+    buff1_again =await downloadJimpImg('./__tests__/assets/one.png')
+    buff2 =await downloadJimpImg('./__tests__/assets/two.png')
+    buff3 =await downloadJimpImg('./__tests__/assets/three.jpg')
+    buff4 =await downloadJimpImg('./__tests__/assets/four.jpg')
+    buff5 =await downloadJimpImg('./__tests__/assets/five.png')
+    buff6 =await downloadJimpImg('./__tests__/assets/six.png')
+    buff7 =await downloadJimpImg('./__tests__/assets/seven.jpg')
+    buff8 =await downloadJimpImg('./__tests__/assets/eight.jpg')
+    buff9 =await downloadJimpImg('./__tests__/assets/nine.jpg')
+    buff10 =await downloadJimpImg('./__tests__/assets/ten.jpg')
+  })
 
-  // describe('isImageUnique function', () => {
-  //   it('sucessfully says a picture is unique or not', async () => {
-  //     // const unique = await isImageUnique(buff1,[buff2,buff3,buff4,buff5,buff6,buff7,buff8,buff9,buff10])
-  //     const notunique = await isImageUnique(buff1,[buff1_again,buff2,buff3,buff4,buff5,buff6,buff7,buff8,buff9,buff10])
-  //     // expect(unique).toBe(true)
-  //     expect(notunique).toBe(false)
-  //   })
-  // })
+    it('successfully discriminates two pictures is identical or not', async ()=>{
+      const different = compare2Images( buff1, buff2)
+      const same = compare2Images( buff1, buff1_again)
+      expect(different).toBe(true)
+      expect(same).toBe(false)
+    })
+    it('works between png and jpg', async ()=>{
+      const different = compare2Images( buff1, buff2)
+      expect(different).toBe(true)
+    })
+
+    it('sucessfully says a picture is unique or not', async () => {
+      const unique = await isImageUnique(buff1,[buff2,buff3,buff4,buff5,buff6,buff7,buff8,buff9,buff10])
+      const notunique = await isImageUnique(buff1,[buff1_again,buff2,buff3,buff4,buff5,buff6,buff7,buff8,buff9,buff10])
+      expect(unique).toBe(true)
+      expect(notunique).toBe(false)
+    })
+  })
 
 })
