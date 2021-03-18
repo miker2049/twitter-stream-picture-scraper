@@ -11,7 +11,7 @@ export default function(data: any, tag: string): ILogObject | undefined{
             }
         }
     } catch (err) {
-        console.error(err)
+        output = undefined;
         // Do something
     }
     return output
