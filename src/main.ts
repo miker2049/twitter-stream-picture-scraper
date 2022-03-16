@@ -19,13 +19,13 @@ program.parseAsync().then((prgrm)=>{
     }
     await deleteAllRules()
     await createRules(query, tag)
-    let [stream, abort] = await createStream()
+    const [stream, abort] = await createStream()
     new Validator(stream, tag, query, count, outDir, logDir, abort)
 
   })(prgrm.opts().query, prgrm.opts().tag, prgrm.opts().outDir, prgrm.opts().logDir, prgrm.opts().count)
 })
 
-function myParseInt(value) {
+function myParseInt(value: any): number {
   // parseInt takes a string and a radix
   const parsedValue = parseInt(value, 10);
   if (isNaN(parsedValue)) {

@@ -1,5 +1,10 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import fetch from 'node-fetch'
+// const fetch = (
+//     url: RequestInfo,
+//     init?: RequestInit
+// ): Promise<Response> => import('node-fetch')
+//   .then(({default: fetch}): Promise<Response> => fetch(url, init));
 
 const ENDPOINT = "https://api.twitter.com/"
 const STREAM = "2/tweets/search/stream"
@@ -17,7 +22,7 @@ function getAllRuleIDS(): Promise<string[]>{
                     'Authorization': 'Bearer '+process.env.TWITTER_BEARER_TOKEN,
                     'Content-type': 'application/json'
                 }
-            }).then(res=>res.json()).then(json=>resolve(json.data ? json.data.map((e)=>e.id): []))
+            }).then(res=>res.json()).then((json: any) =>resolve(json.data ? json.data.map((e)=>e.id): []))
         })
 }
 

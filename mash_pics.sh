@@ -8,10 +8,11 @@ image_ontop(){
         $base \
         \( \
         $new \
-        \( +clone -auto-threshold OTSU \) \
+        \( +clone -auto-threshold Triangle \) \
         -compose dst-in -composite \
         \) \
         -compose src-over -composite \
+        -modulate 100,200,100 \
         $out
 }
 
