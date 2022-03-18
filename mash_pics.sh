@@ -12,7 +12,28 @@ image_ontop(){
         -compose dst-in -composite \
         \) \
         -compose src-over -composite \
-        -modulate 100,200,100 \
+        -modulate 100,130,100 \
+        $out
+}
+
+image_ontop2(){
+    base=$1
+    new=$2
+    out=$3
+
+    magick \
+        $base \
+        \( \
+        $new \
+        \( +clone \
+        -alpha off -fuzz 10% -fill none -draw "matte 0,0 floodfill"  \
+        \( +clone -alpha extract -blur 0x2 -level 50x100% \) \
+        -alpha off -compose copy_opacity -composite \
+        \) \
+        -compose dst-in -composite \
+        \) \
+        -compose src-over -composite \
+        -modulate 100,100,100 \
         $out
 }
 
@@ -52,8 +73,10 @@ mash_pics(){
 }
 
 make_movie(){
-    ffmpeg -r 12 -i $1/%d_image_mashed.png $2
+    ffmpeg -r 12 -pattern_type glob -i "$1/*_mashed.png" $2
 }
+
+
 
 mash_pics $1
 make_movie $1 $2

@@ -31,7 +31,8 @@
     "image-size": "^0.9.3",
     "jimp": "^0.16.1",
     "node-fetch": "^2.6.7",
-    "tslib": "~2.0.3"
+    "tslib": "~2.0.3",
+    "twitter-api-v2": "^1.11.0"
   },
   "volta": {
     "node": "14.15.0"
