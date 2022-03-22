@@ -108,8 +108,16 @@ export class PictureSampler {
   }
   async getImg(url: string): Promise<[Jimp, string] | undefined> {
     console.log(url)
-    const img = await downloadJimpImg(url)
-    const hash = img.hash()
+    let img: Jimp
+    let hash: string
+    try {
+      img = await downloadJimpImg(url)
+      hash = img.hash()
+
+    } catch (err) {
+      // Be eager, move on
+      return undefined
+    }
     if (!(this.hashes.some(h => h == hash))) {
       return [img, hash]
     }
