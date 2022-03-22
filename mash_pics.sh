@@ -37,16 +37,13 @@ image_ontop2(){
         $out
 }
 
-get_name(){
-    echo $1 | cut -f 1 -d "."
-}
-
-get_ext(){
-    echo $1 | cut -f 2 -d "."
-}
 
 get_mash_name(){
-    echo "$(get_name $1)$2.$(get_ext $1)"
+    filename=$(basename "$1")
+    na=${filename%.*}
+    ext=${filename##*.}
+    dir=$(dirname "$1")
+    echo "$dir/$na$2.$ext"
 }
 
 mash_pics(){
@@ -73,10 +70,12 @@ mash_pics(){
 }
 
 make_movie(){
-    ffmpeg -r 12 -pattern_type glob -i "$1/*_mashed.png" $2
+    ffmpeg -r 24 -pattern_type glob -i "$1/*_mashed.png" $2
 }
 
-
+make_audio(){
+    python ./src-audio/make-song.py $("./get-random-song.sh")
+}
 
 mash_pics $1
 make_movie $1 $2
