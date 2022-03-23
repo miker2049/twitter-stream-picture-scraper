@@ -1,10 +1,11 @@
 #!/bin/bash
+magick=./magick
 image_ontop(){
     base=$1
     new=$2
     out=$3
 
-    magick \
+    $magick \
         $base \
         \( \
         $new \
@@ -21,7 +22,7 @@ image_ontop2(){
     new=$2
     out=$3
 
-    magick \
+    $magick \
         $base \
         \( \
         $new \
@@ -58,7 +59,7 @@ mash_pics(){
                 i=1
                 # We actually skip the first picture here,
                 # so we can enforce a consistent square dimension
-                convert -size 500x500 canvas:none $file -compose dst-over -composite $nname
+                $magick -size 500x500 canvas:none $file -compose dst-over -composite $nname
                 # old thing, just copy the first picture
                 # cp $file $nname
                 echo $nname

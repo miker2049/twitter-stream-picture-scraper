@@ -6,13 +6,17 @@ This scraper will validate images as unique among a certain buffer of neighbor t
 ## Requirements
 - node >= 14.14
 - yarn
-- python3
+- python 3.7
 - pipenv
 - imagemagick 7.1.0
 - ffmpeg 5.0
-## Run
+### imagemagick
+Because the script relies, for the moment, on a bleeding edge version of magick, it expects the binary to be located in the base directory as `./magick`.  You can download a release from github, or if you have the right version:
+```
+ln -s $(which magick) ./magick
+```
+## Run it
 to run the cli, (after building):
-
 ```sh
 ./run.sh SECONDS MSG
 ```
