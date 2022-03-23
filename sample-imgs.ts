@@ -1,13 +1,43 @@
-
+import { program, InvalidOptionArgumentError } from 'commander'
 import * as dotenv from 'dotenv'
 import { TwitterApi, ETwitterStreamEvent, TweetStream } from 'twitter-api-v2'
-import downloadJimpImg from './downloadJimpImg'
 import Jimp = require('jimp');
 dotenv.config()
-// Obtain the persistent tokens
-// Create a client from temporary tokens
 
-export class PictureSampler {
+  ; (async () => {
+    program.version('1.0.0');
+
+    program
+      .option('-o, --outDir <path>', 'the out directory for pictures')
+      .option('-c, --count <count>', 'the amount of pictures to get', myParseInt)
+
+    program.parseAsync().then(async (prgrm) => {
+      const opts = prgrm.opts()
+      if (!(opts.outDir && opts.count)) {
+        throw Error("Error in input")
+      }
+
+      const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN)
+      new PictureSampler(client, opts.count, opts.outDir)
+    })
+
+  })();
+
+function myParseInt(value: any): number {
+  // parseInt takes a string and a radix
+  const parsedValue = parseInt(value, 10);
+  if (isNaN(parsedValue)) {
+    throw new InvalidOptionArgumentError('Not a number.');
+  }
+  return parsedValue;
+}
+
+async function downloadJimpImg(url: string): Promise<Jimp> {
+  const jbuff = await Jimp.read(url)
+  return jbuff
+}
+
+class PictureSampler {
   amount: number
   stream: TweetStream
   outdir: string

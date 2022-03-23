@@ -8,10 +8,10 @@ frames=$(($secs * $rate))
 workdir=$(mktemp -d)
 yarn run start -s true -c $frames -o $workdir"/"
 
-python ./src-audio/make-song.py "$(./get-random-song.sh)" \
+python make-song.py "$(./get-random-song.sh)" \
     $workdir/audio.wav $(( 1500 * $secs )) #extra time here bc variable frames
 
-./mash_pics.sh $workdir
+./mash-pics.sh $workdir
 
 ffmpeg -y -r $rate -pattern_type glob -thread_queue_size 512 -i "$workdir/*_mashed.png" \
     -thread_queue_size 512 -i $workdir/audio.wav \
