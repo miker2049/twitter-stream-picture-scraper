@@ -56,9 +56,12 @@ mash_pics(){
             nname=$(get_mash_name $file $suff)
             if [ $i -lt 1 ]; then
                 i=1
-                # echo $file
-                cp $file $nname
-                echo $file
+                # We actually skip the first picture here,
+                # so we can enforce a consistent square dimension
+                convert -size 500x500 canvas:black $nname
+                # old thing, just copy the first picture
+                # cp $file $nname
+                echo $nname
                 last=$nname
             else
                 image_ontop $last $file $nname
@@ -69,13 +72,9 @@ mash_pics(){
     done
 }
 
-make_movie(){
-    ffmpeg -r 24 -pattern_type glob -i "$1/*_mashed.png" $2
-}
 
 make_audio(){
     python ./src-audio/make-song.py $("./get-random-song.sh")
 }
 
 mash_pics $1
-make_movie $1 $2
