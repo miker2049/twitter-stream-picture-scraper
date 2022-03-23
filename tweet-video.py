@@ -17,8 +17,13 @@ CONSUMER_KEY = os.getenv('TWITTER_APP_KEY')
 CONSUMER_SECRET = os.getenv('TWITTER_APP_SECRET')
 ACCESS_TOKEN = os.getenv('TWITTER_ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
-
 VIDEO_FILENAME = sys.argv[1]
+
+STATUS_MSG = ""
+if(len(sys.argv) > 2):
+    raw_msg=str(sys.argv[2])
+    if(len(raw_msg) > 0):
+        STATUS_MSG = raw_msg[0:260]
 
 
 oauth = OAuth1(CONSUMER_KEY,
@@ -155,8 +160,9 @@ class VideoTweet(object):
     '''
     Publishes Tweet with attached video
     '''
+
     request_data = {
-      'status': 'I just uploaded a video with the @TwitterAPI.',
+      'status': STATUS_MSG,
       'media_ids': self.media_id
     }
 
