@@ -6,7 +6,7 @@ outfile=$(mktemp --suffix .mp4)
 rate=24
 frames=$(($secs * $rate))
 workdir=$(mktemp -d)
-yarn run start -s true -c $frames -o $workdir"/"
+yarn run start -c $frames -o $workdir"/"
 
 python make-song.py "$(./get-random-song.sh)" \
     $workdir/audio.wav $(( 1500 * $secs )) #extra time here bc variable frames
