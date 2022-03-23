@@ -12,7 +12,7 @@ image_ontop(){
         -compose dst-in -composite \
         \) \
         -compose src-over -composite \
-        -modulate 100,130,100 \
+        -modulate 100,100,100 \
         $out
 }
 
@@ -58,7 +58,7 @@ mash_pics(){
                 i=1
                 # We actually skip the first picture here,
                 # so we can enforce a consistent square dimension
-                convert -size 500x500 canvas:black $nname
+                convert -size 500x500 canvas:none $file -compose dst-over -composite $nname
                 # old thing, just copy the first picture
                 # cp $file $nname
                 echo $nname
