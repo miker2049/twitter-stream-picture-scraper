@@ -14,11 +14,11 @@
     "typescript": "~4.1.3"
   },
   "scripts": {
-    "start": "node build/src/main.js",
-    "debug": "node --inspect build/src/main.js",
+    "start": "node sample-imgs.js",
+    "debug": "node --inspect sample-imgs.js",
     "clean": "rimraf coverage build tmp",
-    "build": "tsc -p tsconfig.release.json",
-    "build:watch": "tsc -w -p tsconfig.release.json"
+    "build": "tsc ",
+    "build:watch": "tsc -w"
   },
   "author": "Jakub Synowiec <github@jakubsynowiec.info>",
   "license": "Apache-2.0",
@@ -28,8 +28,5 @@
     "jimp": "^0.16.1",
     "tslib": "~2.0.3",
     "twitter-api-v2": "^1.11.0"
-  },
-  "volta": {
-    "node": "14.15.0"
   }
 }
