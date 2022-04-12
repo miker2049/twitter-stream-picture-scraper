@@ -31,3 +31,5 @@ build/
 # dont pollute git with compilations
 *.js
 *.map
+
+.env

@@ -2,4 +2,5 @@
 
 name=$(shuf -n 1 m.txt)
 IFS=''
-echo "~/yuimount/groupchattt/familyshare/music/${name:2}"
+source .env
+echo "$MUSIC_DIR${name:2}"
