@@ -20,6 +20,9 @@ dotenv.config()
       }
 
       const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN)
+      // console.log("file://"+__dirname +"/model/")
+      // @ts-ignore
+      // const model = await nsfwjs.load("file:/"+__dirname +"/model/", {type: "graph"})
       const model = await nsfwjs.load()
       new PictureSampler(client, opts.count, opts.outDir, model)
     })
@@ -52,8 +55,8 @@ class PictureSampler {
   hashes: string[]
   imgUrls: string[]
   currentlyDownloading: number = 0
-  maxImgUrlStack: number = 2000
-  maxDownloadStack: number = 4
+  maxImgUrlStack: number = 200
+  maxDownloadStack: number = 8
   nsfwModel: NSFWModel
 
   constructor(client: TwitterApi, amount: number, outdir: string, nsfwModel: any) {
@@ -111,7 +114,7 @@ class PictureSampler {
       })
       if (media.length > 0) {
         const randI = Math.floor(Math.random() * media.length)
-        this.imgUrls.push(media[randI].url)
+        this.addImgUrl(media[randI].url)
       }
 
       // console.log('Twitter has sent something:', data.includes.media)
@@ -168,6 +171,12 @@ class PictureSampler {
 
     return tf.tensor3d(values, [image.height, image.width, numChannels], 'int32')
   }
+  addImgUrl(url){
+    if(this.imgUrls.length >= this.maxImgUrlStack ){
+      this.imgUrls.shift()
+    }
+    this.imgUrls.push(url)
+  }
 
   extractNeutralProb(arr: { className: string, probability: number }[]): number {
     const entry = arr.find(i => i.className == "Neutral")
@@ -183,7 +192,7 @@ class PictureSampler {
       const nres = await this.checkNSFW(img[0])
       if (this.extractNeutralProb(nres) > 0.92) {
         await this.writeFile(img)
-          console.log(this.i , this.amount)
+        console.log(this.i + "downloaded")
         if (this.i > this.amount) {
           console.log('done')
           this.stream.close();
