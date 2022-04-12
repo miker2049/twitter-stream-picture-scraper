@@ -6,8 +6,8 @@
     "node": ">= 14.15"
   },
   "devDependencies": {
-    "@types/node": "^14.14.22",
     "@types/jimp": "^0.2.28",
+    "@types/node": "^14.14.22",
     "prettier": "~2.2.1",
     "rimraf": "^3.0.2",
     "tsutils": "~3.18.0",
@@ -23,9 +23,12 @@
   "author": "Jakub Synowiec <github@jakubsynowiec.info>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@tensorflow/tfjs": "^3.15.0",
+    "@tensorflow/tfjs-node": "^3.15.0",
     "commander": "^7.0.0",
     "dotenv": "^8.2.0",
     "jimp": "^0.16.1",
+    "nsfwjs": "^2.4.1",
     "tslib": "~2.0.3",
     "twitter-api-v2": "^1.11.0"
   }
