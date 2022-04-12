@@ -1,6 +1,8 @@
 import { program, InvalidOptionArgumentError } from 'commander'
 import * as dotenv from 'dotenv'
 import { TwitterApi, ETwitterStreamEvent, TweetStream } from 'twitter-api-v2'
+import * as nsfwjs from 'nsfwjs'
+import * as tf from '@tensorflow/tfjs-node'
 import Jimp = require('jimp');
 dotenv.config()
 
@@ -18,7 +20,8 @@ dotenv.config()
       }
 
       const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN)
-      new PictureSampler(client, opts.count, opts.outDir)
+      const model = await nsfwjs.load()
+      new PictureSampler(client, opts.count, opts.outDir, model)
     })
 
   })();
@@ -37,6 +40,10 @@ async function downloadJimpImg(url: string): Promise<Jimp> {
   return jbuff
 }
 
+interface NSFWModel {
+  classify: (img: any) => Promise<any>
+}
+
 class PictureSampler {
   amount: number
   stream: TweetStream
@@ -44,18 +51,20 @@ class PictureSampler {
   i: number
   hashes: string[]
   imgUrls: string[]
-  downloading: boolean
-  parallelDownloads: number = 15
+  currentlyDownloading: number = 0
+  maxImgUrlStack: number = 2000
+  maxDownloadStack: number = 4
+  nsfwModel: NSFWModel
 
-  constructor(client: TwitterApi, amount: number, outdir: string) {
+  constructor(client: TwitterApi, amount: number, outdir: string, nsfwModel: any) {
     this.amount = amount
     this.outdir = outdir
     this.hashes = []
     this.imgUrls = []
-    this.downloading = false
     this.i = 0
+    this.nsfwModel = nsfwModel
     this.initStream(client)
-    setInterval(() => this.downloadUrls(), 500)
+    setInterval(() => this.maybeGetImg(), 500)
   }
 
   async initStream(client: TwitterApi) {
@@ -83,7 +92,7 @@ class PictureSampler {
     this.stream.on(
       // Emitted when a Twitter payload (a tweet or not, given the endpoint).
       ETwitterStreamEvent.Data,
-      async (d) => this.dataCb(d)
+      (d) => this.dataCb(d)
     );
 
     this.stream.on(
@@ -94,8 +103,8 @@ class PictureSampler {
 
   }
 
-  async dataCb(data: any) {
-
+  dataCb(data: any) {
+    if (this.imgUrls.length > this.maxImgUrlStack) return
     if (data.includes?.media) {
       const media = data.includes?.media.filter((item: { type: string, url: string, media_key: string }) => {
         return item.type == 'photo'
@@ -108,34 +117,8 @@ class PictureSampler {
       // console.log('Twitter has sent something:', data.includes.media)
     }
   }
-  async downloadUrls() {
-    if (this.imgUrls.length > 0 && this.downloading == false) {
-      this.downloading = true
-    } else { return }
 
-    let urls: string[] = []
-    for (let i = 0; i < Math.min(this.parallelDownloads, this.imgUrls.length); i++) {
-      urls.push(this.imgUrls.shift())
-    }
-    console.log(urls)
-    const imgs = await Promise.all(urls.map(u => this.getImg(u)))
 
-    for (let i = 0; i < imgs.length; i++) {
-      const img: [Jimp, string] = imgs[i]
-      if (img) {
-        await img[0].writeAsync(this.outdir + this.i + '_' + img[1] + ".png")
-        console.log(this.outdir + this.i + '_' + img[1] + ".png")
-        this.i += 1
-      }
-    }
-    if (this.i > this.amount) {
-      console.log('done')
-      this.stream.close();
-      process.exit()
-    } else {
-      this.downloading = false
-    }
-  }
   async getImg(url: string): Promise<[Jimp, string] | undefined> {
     console.log(url)
     let img: Jimp
@@ -152,5 +135,62 @@ class PictureSampler {
       return [img, hash]
     }
     return undefined
+  }
+
+  async writeFile(img: [Jimp, string]) {
+    await img[0].writeAsync(this.outdir + this.i + '_' + img[1] + ".png")
+    console.log(this.outdir + this.i + '_' + img[1] + ".png")
+    this.i += 1
+  }
+
+  async checkNSFW(img: Jimp) {
+    const decoded = await this.convert(img)
+
+    // const buf = await img.getBufferAsync(Jimp.MIME_PNG)
+    // const decoded = tf.node.decodeImage(buf, 4)
+    const results = await this.nsfwModel.classify(decoded)
+    // const results = "hey hey"
+    decoded.dispose()
+    return results
+  }
+
+  async convert(img: Jimp): Promise<tf.Tensor3D> {
+    // Decoded image in UInt8 Byte array
+    const image = img.bitmap
+
+    const numChannels = 3
+    const numPixels = image.width * image.height
+    const values = new Int32Array(numPixels * numChannels)
+
+    for (let i = 0; i < numPixels; i++)
+      for (let c = 0; c < numChannels; ++c)
+        values[i * numChannels + c] = image.data[i * 4 + c]
+
+    return tf.tensor3d(values, [image.height, image.width, numChannels], 'int32')
+  }
+
+  extractNeutralProb(arr: { className: string, probability: number }[]): number {
+    const entry = arr.find(i => i.className == "Neutral")
+    return entry.probability
+  }
+
+  async maybeGetImg() {
+    if (this.imgUrls.length < 1) return
+    if (this.currentlyDownloading >= this.maxDownloadStack) return
+    this.currentlyDownloading += 1
+    const img = await this.getImg(this.imgUrls.shift())
+    if (img) {
+      const nres = await this.checkNSFW(img[0])
+      if (this.extractNeutralProb(nres) > 0.92) {
+        await this.writeFile(img)
+          console.log(this.i , this.amount)
+        if (this.i > this.amount) {
+          console.log('done')
+          this.stream.close();
+          process.exit()
+        }
+      }
+    }
+    this.currentlyDownloading -= 1
   }
 }
