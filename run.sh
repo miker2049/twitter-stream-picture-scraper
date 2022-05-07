@@ -8,7 +8,7 @@ frames=$(($secs * $rate))
 workdir=$(mktemp -d)
 yarn run start -c $frames -o $workdir"/"
 
-pipenv run python make-song.py "$(./get-random-song.sh)" \
+/yui-home/mik/.local/bin/pipenv run python make-song.py "$(./get-random-song.sh)" \
     $workdir/audio.wav $(( 1500 * $secs )) #extra time here bc variable frames
 
 ./mash-pics.sh $workdir
@@ -29,7 +29,7 @@ ffmpeg -y -r $rate -pattern_type glob -thread_queue_size 512 -i "$workdir/*_mash
 #-ar 44100  -ac 2  -strict experimental -r 30
 #1000 at 24 = 42000ms
 # workdir="/tmp/tmp.b7Yo1n0sw2"
-pipenv run python tweet-video.py $outfile $msg
+/yui-home/mik/.local/bin/pipenv run python tweet-video.py $outfile $msg
 rm -rf $workdir
 rm $outfile
 # echo $workdir

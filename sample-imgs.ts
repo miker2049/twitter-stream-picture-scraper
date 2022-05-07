@@ -6,28 +6,28 @@ import * as tf from '@tensorflow/tfjs-node'
 import Jimp = require('jimp');
 dotenv.config()
 
-  ; (async () => {
-    program.version('1.0.0');
+; (async () => {
+  program.version('1.0.0');
 
-    program
-      .option('-o, --outDir <path>', 'the out directory for pictures')
-      .option('-c, --count <count>', 'the amount of pictures to get', myParseInt)
+  program
+    .option('-o, --outDir <path>', 'the out directory for pictures')
+    .option('-c, --count <count>', 'the amount of pictures to get', myParseInt)
 
-    program.parseAsync().then(async (prgrm) => {
-      const opts = prgrm.opts()
-      if (!(opts.outDir && opts.count)) {
-        throw Error("Error in input")
-      }
+  program.parseAsync().then(async (prgrm) => {
+    const opts = prgrm.opts()
+    if (!(opts.outDir && opts.count)) {
+      throw Error("Error in input")
+    }
 
-      const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN)
-      // console.log("file://"+__dirname +"/model/")
-      // @ts-ignore
-      // const model = await nsfwjs.load("file:/"+__dirname +"/model/", {type: "graph"})
-      const model = await nsfwjs.load()
-      new PictureSampler(client, opts.count, opts.outDir, model)
-    })
+    const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN)
+    // console.log("file://"+__dirname +"/model/")
+    // @ts-ignore
+    // const model = await nsfwjs.load("file:/"+__dirname +"/model/", {type: "graph"})
+    const model = await nsfwjs.load()
+    new PictureSampler(client, opts.count, opts.outDir, model)
+  })
 
-  })();
+})();
 
 function myParseInt(value: any): number {
   // parseInt takes a string and a radix
@@ -123,7 +123,6 @@ class PictureSampler {
 
 
   async getImg(url: string): Promise<[Jimp, string] | undefined> {
-    console.log(url)
     let img: Jimp
     let hash: string
     try {
@@ -187,7 +186,7 @@ class PictureSampler {
     if (this.imgUrls.length < 1) return
     if (this.currentlyDownloading >= this.maxDownloadStack) return
     this.currentlyDownloading += 1
-    const img = await this.getImg(this.imgUrls.shift())
+    const img = await this.getImg(this.imgUrls.pop())
     if (img) {
       const nres = await this.checkNSFW(img[0])
       if (this.extractNeutralProb(nres) > 0.92) {
