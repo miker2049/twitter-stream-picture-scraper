@@ -140,8 +140,10 @@ class PictureSampler {
   }
 
   async writeFile(img: [Jimp, string]) {
-    await img[0].writeAsync(this.outdir + this.i + '_' + img[1] + ".png")
-    console.log(this.outdir + this.i + '_' + img[1] + ".png")
+    const name = String(this.i).padStart(3,'0')
+    const fullp = this.outdir + name + '_' + "img.png"
+    await img[0].writeAsync(fullp)
+    console.log(fullp)
     this.i += 1
   }
 
